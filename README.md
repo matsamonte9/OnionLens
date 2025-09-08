@@ -66,6 +66,7 @@
 👥 Authors 
 
   GITHUB USERNAME: matsamonte9 – Machine Learning/Model Development (Onion Validation & Armyworm Detection)
+
   GITHUB USERNAME: Luwisiii - Frontend and API Integration
   
 
