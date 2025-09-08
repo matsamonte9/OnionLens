@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+  <link rel="icon" href={{ url_for('static', filename='images/logo.ico') }} type="image/x-icon">
+  <title>OnionLens | Home</title>
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/font-awesome.min.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/responsive.css') }}">
+  
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.9.1/font/bootstrap-icons.min.css" rel="stylesheet">
+  
+
+
+  
+</head>
+
+<body>
+  
+  <div class="hero_area">
+    <!-- header section strats -->
+    <header class="header_section">
+      <div class="container-fluid">
+        <nav class="navbar navbar-expand-lg custom_nav-container ">
+          <a class="navbar-brand" href="#">
+            <span>
+              <img src={{ url_for('static', filename='images/logo1.png') }} alt="logo"  class="logo">
+            </span>
+          </a>
+
+          <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class=""> </span>
+          </button>
+
+          <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav  ">
+              <li class="nav-item active">
+                <a class="nav-link active" aria-current="page" href="#" onclick="scrollToContent('home', event), handleNavLinkClick(event)">
+                  <i class="fa fa-camera"></i> Home</a>
+              </li>
+              <li class="nav-item">
+                 <a class="nav-link" href="#" onclick="scrollToContent('manual', event), handleNavLinkClick(event)">
+                   <i class="fa fa-book"></i> User Manual
+                 </a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="#" onclick="scrollToContent('about', event), handleNavLinkClick(event)">
+                 <i class="fa fa-users"></i> About
+                </a>
+              </li>
+              <li class="nav-item">
+                 <a class="nav-link" href="#" onclick="scrollToContent('faq', event), handleNavLinkClick(event)">
+                  <i class="fa fa-question"></i> FAQ
+                 </a>
+              </li>
+            </ul>
+          </div>
+        </nav>
+      </div>
+    </header>
+    <!-- end header section -->
+    <!-- slider section -->
+    <section class="slider_section ">
+            <div class="container ">
+              <div class="row">
+                <div class="col-md-6">
+                  <div class="img-box">
+                    <img src={{ url_for('static', filename='images/slider-img.png') }} alt="">
+                  </div>
+                </div>
+                  <div class="col-md-6">
+                  <div class="detail-box" id="home">
+                    <div id="card-upload" class="card rounded-border">
+                      <div class="card-body transparent-bg">
+                        <h1 class="card-title mb-3">Upload Image</h1>
+                        <form action="/predict" method="post" enctype="multipart/form-data">
+                          <div class="mb-3">
+                            <label for="imageUpload" class="form-label">
+                              Select Image to Upload:<br>
+                              NOTE: Supported formats e.g., (jpg, jpeg, png)
+                            </label>
+                            <input type="file" class="form-control" id="imageUpload" name="imageUpload" accept="image/*">
+                          </div>
+                          <button type="submit" class="btn btn-upload">Upload Image</button>
+                        </form>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                  
+                  <!-- Error Modal -->
+                    <div class="modal fade" id="alertModal" tabindex="-1" aria-labelledby="alertModalLabel" aria-hidden="true">
+                      <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+                       <div class="modal-content">
+                        <div class="modal-header">
+                          <h5 class="modal-title" id="alertModalLabel">Error</h5>
+                           <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                      <div class="modal-body">
+                        {{ modal_message | default('An error occurred.') }}
+                      </div>
+                    </div>
+                    </div>
+                   </div>
+                    <!-- Results Modal -->
+                    <div class="modal fade" id="resultsModal" tabindex="-1" aria-labelledby="resultsModalLabel" aria-hidden="true">
+                      <div class="modal-dialog modal-dialog-centered modal-xl"> 
+                        <div class="modal-content">
+                          <div class="modal-header">
+                           <h5 class="modal-title" id="resultsModalLabel">Results</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                          </div>
+                         <div class="modal-body text-center d-flex flex-column flex-md-row justify-content-center"> 
+                           <!-- Processed Image -->
+                            {% if processed_image_url %}
+                             <div class="processed-image mb-4">
+                               <h6>Processed Image</h6>
+                               <img src="{{ processed_image_url }}" class="img-fluid larger-image mb-3" alt="Processed Image">
+                             </div>
+                           {% endif %}
+                                                                    
+                          <!-- Saliency Map (for unhealthy images) -->
+                            {% if saliency_map_url %}
+                              <div class="saliency-map">
+                                <h6>Saliency Map</h6>
+                                  <img src="{{ saliency_map_url }}" class="img-fluid larger-image" alt="Saliency Map">
+                             </div>
+                            {% endif %}
+                            </div>
+                            <!-- Countermeasures Section for Unhealthy Onion Images -->
+                              {% if countermeasures %}
+                                <div class="modal-body">
+                                  <div class="countermeasures text-start">
+                                    <h5>Steps to Counter Armyworm Infestation</h5>
+                                    <ul>
+                                      {% for step in countermeasures %}
+                                      <li>{{ step }}</li>
+                                      {% endfor %}
+                                         </ul>
+                                  </div>
+                               </div>
+                              {% endif %}
+                            </div>
+                        </div>
+                     </div>          
+                </div>
+              </div>
+            </div>
+          </div>
+      </div>
+
+    </section>
+    <!-- end slider section -->
+  </div>
+  
+  <!-- service section -->
+  <section class="service_section layout_padding">
+    <div class="container" id="manual">
+      <div class="heading_container">
+        <h2>
+          User Manual and System Requirements
+        </h2>
+        <p>
+          This thorough, step-by-step tutorial will show you how to use the detector to take pictures of your Onion, analyze them, and get instantaneous predictions about their health—including whether they're thriving or afflicted with the disease.
+        </p>
+      </div>
+      <div class="row">
+        <div class="col-md-6 col-lg-3">
+          <div class="box">
+            <div class="img-box">
+              <img src={{ url_for('static', filename='images/s1.png') }} alt="">
+            </div>
+            <div class="detail-box">
+              <h5>
+                Image Uploading
+              </h5>
+              <p>
+                1. Choose an image to upload and click the "Upload" button.
+              </p>
+              
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6 col-lg-3">
+          <div class="box">
+            <div class="img-box">
+              <img src={{ url_for('static', filename='images/s2.png') }} alt="">
+            </div>
+            <div class="detail-box">
+              <h5>
+                Diagnostic Result
+              </h5>
+              <p>
+                2. The system will analyze the image and display the results.  
+              </p>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6 col-lg-3">
+          <div class="box">
+            <div class="img-box">
+              <img src={{ url_for('static', filename='images/s3.png') }} alt="">
+            </div>
+            <div class="detail-box">
+              <h5>
+                Hardware
+              </h5>
+              <p>
+                Smartphone/iOS with rear-facing camera<br/>
+                Laptop/Desktop with minimum 250mb storage
+              </p>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6 col-lg-3">
+          <div class="box">
+            <div class="img-box">
+              <img src={{ url_for('static', filename='images/s4.png') }} alt="">
+            </div>
+            <div class="detail-box">
+              <h5>
+                Permission
+              </h5>
+              <p>
+                Camera Access
+              </p>
+              
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  <!-- end service section -->
+
+  <!-- about section -->
+  
+  <section class="about_section layout_padding">
+    <div class="container  " id="about">
+      <div class="row">
+        <div class="col-md-6">
+          <div class="detail-box">
+            <div class="heading_container">
+              <h2>
+                About Us
+              </h2>
+            </div>
+            <p>
+              OnionLens is intended to detect and differentiate healthy and unhealthy onion harvests. This technology uses innovative technology such as artificial intelligence, data processing, and image recognition to examine visual data gathered from onion farms. Through processing of this data, OnionLens is able to precisely identify the typical symptoms and patterns that indicate health or illness, enabling early identification of impacted plants.<br><br>
+              With the help of OnionLens, farmers and agricultural workers could identify onion infections early, allowing them to employ effective management techniques and reduce the disease's economic impact on onion production.
+            </p>
+          </div>
+        </div>
+        <div class="col-md-6 ">
+          <div class="img-box">
+            <img src={{ url_for('static', filename='images/logo1.png') }} alt="logo"  class="logo">
+          </div>
+        </div>
+      
+      </div>
+    </div>
+  </section>
+  
+  <!-- end about section -->
+  
+  <!-- case section -->
+  
+<section class="case_section layout_padding">
+  <div class="container" id="faq">
+    <div class="heading_container text-center mb-4">
+      <h2 class="fw-bold">Frequently Asked Questions</h2>
+      <p class="text-muted">Find answers to the most common questions about OnionLens.</p>
+    </div>
+
+    <div class="row">
+      <div class="col-md-8 mx-auto">
+        <div class="accordion" id="faqAccordion">
+
+          <div class="card">
+            <div class="card-header" id="headingOne">
+              <h5 class="mb-0">
+                <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                  What is OnionLens?
+                </button>
+              </h5>
+            </div>
+            <div id="collapseOne" class="collapse show" aria-labelledby="headingOne" data-parent="#faqAccordion">
+              <div class="card-body">
+                Farmers can identify and manage common onion diseases with the help of OnionLens, an onion disease classification tool. OnionLens uses a deep learning algorithm for image identification to diagnose and categorize illnesses. It is user-friendly, economical, and tailored to farmers' needs.
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header" id="headingTwo">
+              <h5 class="mb-0">
+                <button class="btn btn-link collapsed" type="button" data-toggle="collapse" data-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                  Can OnionLens be used for other crops besides onion?
+                </button>
+              </h5>
+            </div>
+            <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#faqAccordion">
+              <div class="card-body">
+                Although its primary focus is on onion crops, OnionLens' technology can be adapted and trained specifically for other crops.
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header" id="headingThree">
+              <h5 class="mb-0">
+                <button class="btn btn-link collapsed" type="button" data-toggle="collapse" data-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                  Can anyone use OnionLens regardless of their technical expertise?
+                </button>
+              </h5>
+            </div>
+            <div id="collapseThree" class="collapse" aria-labelledby="headingThree" data-parent="#faqAccordion">
+              <div class="card-body">
+                Yes, a wide spectrum of people, including those with little technological experience, can use and benefit from OnionLens. The simple user interface allows farmers to easily take and share photos of their onion harvests.
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header" id="headingFour">
+              <h5 class="mb-0">
+                <button class="btn btn-link collapsed" type="button" data-toggle="collapse" data-target="#collapseFour" aria-expanded="false" aria-controls="collapseFour">
+                  What to do if there is armyworm in your crops?
+                </button>
+              </h5>
+            </div>
+            <div id="collapseFour" class="collapse" aria-labelledby="headingFour" data-parent="#faqAccordion">
+              <div class="card-body">
+                Verify that the symptoms identified correspond to an armyworm infection. Remove affected plants and caterpillars manually if the infestation is minimal. Use pheromone traps for moths, neem oil, or insecticidal soap for organic gardening. Monitor plants closely for early signs and consult agricultural experts for guidance.
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+  
+
+  <!-- end case section -->
+
+  
+
+  <div class="footer_container">
+    <!-- info section -->
+
+    <section class="info_section ">
+      <div class="container">
+        <div class="row">
+          <div class="col-md-5 col-lg-5 ">
+            <div class="info_detail">
+              <h4>
+                OnionLens
+              </h4>
+              <p>
+                Detecting Armyworm Infestation in <br>Onion using Image Processing Techniques
+              </p>
+            </div>
+          </div>
+          
+          <div class="col-md-7 col-lg-7 mb-0 ml-auto">
+            <div class="info_social">
+              <a href="https://www.facebook.com/profile.php?id=100007595088235&mibextid=ZbWKwL">
+                <i class="fab fa-facebook-f"></i>
+              </a>
+              <a href="https://x.com/gdhllymgue?t=O-g87vCQ7HwcjYGdzhF-dA&s=09">
+                <i class="fab fa-twitter"></i>
+              </a>
+              <a href="https://www.instagram.com/plouisss?igsh=MXE3cTFmZDRwZ200bw==">
+                <i class="fab fa-instagram"></i>
+              </a>
+              <a href="https://www.threads.net/@markitongatog">
+                <i class="bi bi-threads" aria-hidden="true"></i>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- end info section -->
+
+    <!-- footer section -->
+    <footer class="footer_section">
+      <div class="container">
+        <p>
+        <span id="displayYear"> </span>
+          <span>&copy; OnionLens.</span>
+        </p>
+      </div>
+    </footer>
+    <!-- footer section -->
+  </div>
+  
+  <div id="scrollToTop" onclick="scrollToTop()">Scroll to Top</div> 
+  
+   <!-- jQuery (required for Bootstrap 4) -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <!-- Popper.js (required for Bootstrap 4) -->
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+
+    <!-- Bootstrap 4 JS -->
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+  
+
+  <!-- bootstrap js -->
+  <script src="{{ url_for('static', filename='js/bootstrap.js') }}" defer></script> 
+  <script src="{{ url_for('static', filename='js/custom.js') }}" defer></script>  
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      {% if show_error_modal %}
+        var alertModal = new bootstrap.Modal(document.getElementById('alertModal'));
+        alertModal.show();
+      {% elif show_result_modal %}
+        var resultsModal = new bootstrap.Modal(document.getElementById('resultsModal'));
+        resultsModal.show();
+      {% endif %}
+    });
+  </script>
+  
+
+</body>
+
+</html>
